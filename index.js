@@ -1,42 +1,16 @@
 /* eslint-disable no-undef */
-const express = require("express");
-const multer = require("multer");
-const cors = require("cors");
-const path = require("path");
-const fs = require("fs");
+const jsonServer = require("json-server"); // importing json-server library
+const server = jsonServer.create();
+const router = jsonServer.router("db.json");
+const middlewares = jsonServer.defaults();
+const port = process.env.PORT || 8080; //  chose port from here like 8080, 3001
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+server.use(middlewares);
+server.use(router);
 
-const uploadDir = path.join(__dirname, "uploads");
+server.listen(port);
 
-// Ensure the uploads directory exists
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
 
-// Set storage for uploaded files
-const storage = multer.diskStorage({
-    destination: uploadDir,
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Rename file
-    }
-});
+// mongodb+srv://PalashArunNandanwar:<db_password>@chatcluster1.hvxzp.mongodb.net/?retryWrites=true&w=majority&appName=ChatCluster1
 
-const upload = multer({ storage });
-
-// Upload route
-app.post("/upload", upload.single("image"), (req, res) => {
-    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-
-    const imageUrl = `https://${req.headers.host}/uploads/${req.file.filename}`;
-    res.json({ imageUrl });
-});
-
-// Serve uploaded images
-app.use("/uploads", express.static(uploadDir));
-
-// Use dynamic PORT for Render
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// jL4ydmu8z7hD9qeq  -----  arunpalash1
